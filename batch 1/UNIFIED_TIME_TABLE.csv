@@ -1,0 +1,61 @@
+Day,Time Slot,Course Code,Room Number
+Day 1,08:00 - 08:50,P1,Unknown
+Day 1,08:50 - 09:40,P2/X,Unknown
+Day 1,09:45 - 10:35,P3/X,Unknown
+Day 1,10:40 - 11:30,P4,Unknown
+Day 1,11:35 - 12:25,P5,Unknown
+Day 1,12:30 - 13:20,A,UB 1206
+Day 1,13:25 - 14:15,A,UB 1206
+Day 1,14:20 - 15:10,F,UB 1206
+Day 1,15:10 - 16:00,F,UB 1206
+Day 1,16:00 - 16:50,G,UB 1207
+Day 1,16:50 - 17:30,L11,UB 713B
+Day 1,17:30 - 18:10,L12,UB 713B
+Day 2,08:00 - 08:50,B,UB 1205
+Day 2,08:50 - 09:40,B/X,UB 1205
+Day 2,09:45 - 10:35,G/X,UB 1207
+Day 2,10:40 - 11:30,G,UB 1207
+Day 2,11:35 - 12:25,A,UB 1206
+Day 2,12:30 - 13:20,P16,Unknown
+Day 2,13:25 - 14:15,P17,Unknown
+Day 2,14:20 - 15:10,P18,Unknown
+Day 2,15:10 - 16:00,P19,Unknown
+Day 2,16:00 - 16:50,P20,Unknown
+Day 2,16:50 - 17:30,L21,UB 1206
+Day 2,17:30 - 18:10,L22,UB 1206
+Day 3,08:00 - 08:50,P21,Unknown
+Day 3,08:50 - 09:40,P22/X,Unknown
+Day 3,09:45 - 10:35,P23/X,Unknown
+Day 3,10:40 - 11:30,P24,Unknown
+Day 3,11:35 - 12:25,P25,Unknown
+Day 3,12:30 - 13:20,C,UB 1206
+Day 3,13:25 - 14:15,C,UB 1206
+Day 3,14:20 - 15:10,A,UB 1206
+Day 3,15:10 - 16:00,D,UB 1206
+Day 3,16:00 - 16:50,B,UB 1205
+Day 3,16:50 - 17:30,L31,Unknown
+Day 3,17:30 - 18:10,L32,Unknown
+Day 4,08:00 - 08:50,D,UB 1206
+Day 4,08:50 - 09:40,D/X,UB 1206
+Day 4,09:45 - 10:35,B/X,UB 1205
+Day 4,10:40 - 11:30,E,Unknown
+Day 4,11:35 - 12:25,C,UB 1206
+Day 4,12:30 - 13:20,P36,Unknown
+Day 4,13:25 - 14:15,P37,Unknown
+Day 4,14:20 - 15:10,P38,Unknown
+Day 4,15:10 - 16:00,P39,Unknown
+Day 4,16:00 - 16:50,P40,Unknown
+Day 4,16:50 - 17:30,L41,Unknown
+Day 4,17:30 - 18:10,L42,Unknown
+Day 5,08:00 - 08:50,P41,Unknown
+Day 5,08:50 - 09:40,P42/X,Unknown
+Day 5,09:45 - 10:35,P43/X,UB 713A
+Day 5,10:40 - 11:30,P44,UB 713A
+Day 5,11:35 - 12:25,P45,Unknown
+Day 5,12:30 - 13:20,E,Unknown
+Day 5,13:25 - 14:15,E,Unknown
+Day 5,14:20 - 15:10,C,UB 1206
+Day 5,15:10 - 16:00,F,UB 1206
+Day 5,16:00 - 16:50,D,UB 1206
+Day 5,16:50 - 17:30,L51,Unknown
+Day 5,17:30 - 18:10,L52,Unknown
