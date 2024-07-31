@@ -94,7 +94,6 @@ platformdirs==2.5.2
 prompt-toolkit==3.0.24
 protobuf==3.20.1
 psutil==6.0.0
-PyAudio @ file:///C:/Users/Kavin/pipwin/PyAudio-0.2.11-cp39-cp39-win_amd64.whl
 pycparser==2.21
 pydantic==2.6.3
 pydantic_core==2.16.3
