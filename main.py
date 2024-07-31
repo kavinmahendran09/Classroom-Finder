@@ -132,7 +132,7 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
 
 # Example of using the process_data function in the main application
 def process_data(day_order, time_table):
-    details = find_free_rooms("13:25")
+    details = find_free_rooms()
     return details
 
 if __name__ == '__main__':
