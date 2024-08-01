@@ -1,5 +1,6 @@
 import pandas as pd
 from datetime import datetime, timedelta
+import pytz
 
 # Define a global variable for the current day order
 global_current_day_order = None
@@ -42,11 +43,12 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
         ("15:10", "16:00"), ("16:00", "16:50"), ("16:50", "17:30"), ("17:30", "18:10")
     ]
 
-    # Get current time
+    # Get current time in IST
     if custom_time:
         current_time = custom_time
     else:
-        current_time = datetime.now().strftime("%H:%M")
+        ist = pytz.timezone('Asia/Kolkata')
+        current_time = datetime.now(ist).strftime("%H:%M")
 
     # Check if the current time is before 8:00 AM or after 4:50 PM
     if current_time < "08:00":
@@ -150,4 +152,3 @@ if __name__ == '__main__':
     # Call process_data with the custom time
     result = process_data(day_order_df, unified_timetable)
     print(result)
-
