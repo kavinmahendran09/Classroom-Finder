@@ -50,35 +50,55 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
         ist = pytz.timezone('Asia/Kolkata')
         current_time = datetime.now(ist).strftime("%H:%M")
 
-    # Check if the current time is before 8:00 AM or after 4:50 PM
-    if current_time < "08:00":
-        return {"status": "error", "message": "College not yet started.", "data": []}
-    elif current_time > "16:50":
-        return {"status": "error", "message": "College over.", "data": []}
+    # Get current date
+    if custom_day:
+        current_date = datetime.strptime(custom_day, "%d %B %Y")
+    else:
+        current_date = datetime.now()
 
-    # Get current date and corresponding day order
+    # Adjust the date format to match the CSV file
+    current_day = current_date.strftime("%d").lstrip("0")  # Remove leading zeros from the day
+    current_month = current_date.strftime("%B")
+    day_order_row = day_order_df[(day_order_df['Date'].astype(str) == current_day) &
+                                 (day_order_df['Month'] == current_month)]
+
+    # Check if the day order is NULL or day_order_row is empty
     if custom_day_order:
         current_day_order = custom_day_order
     else:
-        if custom_day:
-            current_date = datetime.strptime(custom_day, "%d %B %Y")
-        else:
-            current_date = datetime.now()
-
-        # Adjust the date format to match the CSV file
-        current_day = current_date.strftime("%d").lstrip("0")  # Remove leading zeros from the day
-        current_month = current_date.strftime("%B")
-        day_order_row = day_order_df[(day_order_df['Date'].astype(str) == current_day) &
-                                     (day_order_df['Month'] == current_month)]
-
-        # Check if the day order is NULL or day_order_row is empty
         if day_order_row.empty or pd.isnull(day_order_row['Day_order'].values[0]):
-            return {"status": "error", "message": "College doesn't run today.", "data": []}
-
+            return {
+                "status": "error",
+                "message": "College doesn't run today.",
+                "current_day_order": None,
+                "current_time": current_time,
+                "current_date": current_date.strftime("%d %B %Y"),
+                "free_rooms": []
+            }
         current_day_order = int(day_order_row['Day_order'].values[0])
 
     # Update the global variable
     global_current_day_order = current_day_order
+
+    # Check if the current time is before 8:00 AM or after 4:50 PM
+    if current_time < "08:00":
+        return {
+            "status": "error",
+            "message": "College not yet started.",
+            "current_day_order": current_day_order,
+            "current_time": current_time,
+            "current_date": current_date.strftime("%d %B %Y"),
+            "free_rooms": []
+        }
+    elif current_time > "16:50":
+        return {
+            "status": "error",
+            "message": "College over.",
+            "current_day_order": current_day_order,
+            "current_time": current_time,
+            "current_date": current_date.strftime("%d %B %Y"),
+            "free_rooms": []
+        }
 
     # Find the current time slot
     current_time_slot = None
@@ -87,41 +107,46 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
             current_time_slot = f"{start} - {end}"
             break
 
-    # Initialize free_rooms as an empty list
-    free_rooms = []
     if current_time_slot is None:
         next_update_time = round_time_to_nearest_five(current_time)
-        return {"status": "error", "message": f"Free rooms get updated at: {next_update_time}", "data": []}
-    else:
-        # Find occupied rooms from the unified timetable
-        occupied_rooms = set()
+        return {
+            "status": "error",
+            "message": f"Free rooms get updated at: {next_update_time}",
+            "current_day_order": current_day_order,
+            "current_time": current_time,
+            "current_date": current_date.strftime("%d %B %Y"),
+            "free_rooms": []
+        }
+    
+    # Find occupied rooms from the unified timetable
+    occupied_rooms = set()
 
-        occupied_rooms.update(
-            unified_timetable.loc[(unified_timetable['Day'] == f"Day {current_day_order}") &
-                                  (unified_timetable['Time Slot'] == current_time_slot),
-                                  'Room Number'].tolist()
-        )
+    occupied_rooms.update(
+        unified_timetable.loc[(unified_timetable['Day'] == f"Day {current_day_order}") &
+                              (unified_timetable['Time Slot'] == current_time_slot),
+                              'Room Number'].tolist()
+    )
 
-        # Map slot to room number from the detailed timetable
-        detailed_slots = detailed_timetable['Slot'].tolist()
-        detailed_rooms = detailed_timetable['RoomNo.'].tolist()
-        detailed_room_map = dict(zip(detailed_slots, detailed_rooms))
+    # Map slot to room number from the detailed timetable
+    detailed_slots = detailed_timetable['Slot'].tolist()
+    detailed_rooms = detailed_timetable['RoomNo.'].tolist()
+    detailed_room_map = dict(zip(detailed_slots, detailed_rooms))
 
-        # Identify occupied rooms in the detailed timetable based on the current time slot
-        for course_code in unified_timetable.loc[
-            (unified_timetable['Day'] == f"Day {current_day_order}") & 
-            (unified_timetable['Time Slot'] == current_time_slot),
-            'Course Code'
-        ]:
-            slot = course_code.split('/')[0]
-            room_number = detailed_room_map.get(slot, "Unknown")
-            occupied_rooms.add(room_number)
+    # Identify occupied rooms in the detailed timetable based on the current time slot
+    for course_code in unified_timetable.loc[
+        (unified_timetable['Day'] == f"Day {current_day_order}") & 
+        (unified_timetable['Time Slot'] == current_time_slot),
+        'Course Code'
+    ]:
+        slot = course_code.split('/')[0]
+        room_number = detailed_room_map.get(slot, "Unknown")
+        occupied_rooms.add(room_number)
 
-        # List all possible rooms
-        all_rooms = set(unified_timetable['Room Number'].unique()).union(set(detailed_timetable['RoomNo.'].unique()))
+    # List all possible rooms
+    all_rooms = set(unified_timetable['Room Number'].unique()).union(set(detailed_timetable['RoomNo.'].unique()))
 
-        # Find free rooms and remove 'Unknown'
-        free_rooms = [room for room in list(all_rooms - occupied_rooms) if room != "Unknown"]
+    # Find free rooms and remove 'Unknown'
+    free_rooms = [room for room in list(all_rooms - occupied_rooms) if room != "Unknown"]
 
     return {
         "status": "success",
