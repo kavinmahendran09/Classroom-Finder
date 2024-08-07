@@ -27,9 +27,7 @@ button {
     border-radius: 5px;
 }
 
-button:hover {
-    background-color: #1a2161;
-}
+
 
 a {
     text-decoration: none;
