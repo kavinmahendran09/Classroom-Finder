@@ -21,7 +21,7 @@
         }
 
         .button:hover {
-            background-color: #0056b3;
+            opacity: 0.7;
         }
 
         .card-container {
@@ -169,7 +169,7 @@
         <form action="{{ url_for('index') }}" method="get" style="display:inline;">
             <button type="submit" class="button">Go back</button>
         </form>
-        <button class="button" onclick="location.reload()">Refresh</button>
+        <button class="button" onclick="window.location.href = window.location.href;">Refresh</button>
     </div>
 
     <script>
