@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classroom Finder</title>
+<<<<<<< HEAD
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
@@ -77,21 +78,40 @@
             }
         }
     </style>
+=======
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+>>>>>>> 9ecb46e (buildingpage)
 </head>
 <body>
     <div class="container">
         <h1>Free Classroom Finder</h1>
         <div class="main-card">
             <h2>Find an Empty Room</h2>
+<<<<<<< HEAD
             <p>Looking for a quiet place to study or have lunch? Our tool helps you find available classrooms on campus.</p>
             <form action="{{ url_for('process') }}" method="post">
                 <button type="submit" class="button">Find Free Rooms</button>
+=======
+            <p style="color: rgb(147, 145, 145);">Looking for a quiet place to study or have lunch? Our tool helps you find available classrooms on campus.</p>
+            <form action="{{ url_for('building') }}" method="get">
+                <button type="submit" class="button">Choose Building</button>
+>>>>>>> 9ecb46e (buildingpage)
             </form>
         </div>
         <div class="sub-card">
             <h3>How it Works</h3>
+<<<<<<< HEAD
             <p>Our system checks the current schedule and identifies rooms that are not being used.</p>
         </div>
     </div>
+=======
+            <p style="color: rgb(147, 145, 145);">Our system checks the current schedule and identifies rooms that are not being used.</p>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2024 Classroom Finder</p>
+    </footer>
+>>>>>>> 9ecb46e (buildingpage)
 </body>
 </html>

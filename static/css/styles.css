@@ -1,4 +1,5 @@
 body {
+<<<<<<< HEAD
     font-family: Arial, sans-serif;
     background-color: #1c1d21;
     margin: 0;
@@ -46,3 +47,81 @@ ul {
 li {
     margin: 5px 0;
 }
+=======
+    background-color: #1c1d21;
+    color: #ffffff;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 1200px;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    flex: 1;
+}
+
+h1 {
+    font-size: 2em;
+    margin: 20px 0;
+    color: #f2fe9a;
+    text-align: center;
+}
+
+.button {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    background-color: rgb(18, 136, 3);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 20px 0;
+    font-size: 1.1em;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+.main-card, .sub-card {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    background-color: #2d2e33;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .main-card, .sub-card {
+        width: 90%;
+        margin: 0 auto 20px auto;
+    }
+}
+
+footer {
+    background-color: #000000; /* Grey background */
+    color: #ffffff;
+    text-align: center;
+    padding: 10px 0;
+    width: 100%;
+    position: relative;
+    bottom: 0;
+}
+>>>>>>> 9ecb46e (buildingpage)

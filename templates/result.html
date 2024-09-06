@@ -9,9 +9,13 @@
 </head>
 <body>
     <div class="container">
+<<<<<<< HEAD
         <h1>Processing Results</h1>
         <p>Status: {{ result.status }}</p>
         <p>Message: {{ result.message }}</p>
+=======
+        <h1>Free Rooms</h1>
+>>>>>>> 9ecb46e (buildingpage)
         <div class="card-container">
             <div class="card current-info-card">
                 <h3>Current Information</h3>
@@ -45,12 +49,29 @@
                 </div>
             {% endif %}
         </div>
+<<<<<<< HEAD
         <form action="{{ url_for('index') }}" method="get" style="display:inline;">
             <button type="submit" class="button">Go back</button>
         </form>
         <button class="button" onclick="refreshPage()">Refresh</button>
     </div>
 
+=======
+        <div class="button-container">
+            <form action="{{ url_for('building') }}" method="get">
+                <button type="submit" class="button">Go back</button>
+            </form>
+            <form action="{{ url_for('process') }}" method="post">
+                <button type="submit" class="button">Refresh</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Classroom Finder</p>
+    </footer>
+
+>>>>>>> 9ecb46e (buildingpage)
     <script>
         const feedbackState = {};
 
@@ -82,10 +103,13 @@
                 }
             }
         }
+<<<<<<< HEAD
 
         function refreshPage() {
             window.location.reload();
         }
+=======
+>>>>>>> 9ecb46e (buildingpage)
     </script>
 </body>
 </html>
