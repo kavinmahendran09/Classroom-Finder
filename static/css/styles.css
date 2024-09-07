@@ -1,4 +1,5 @@
 body {
+    height : 100%;
     background-color: #1c1d21;
     color: #ffffff;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
@@ -8,6 +9,8 @@ body {
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .container {
