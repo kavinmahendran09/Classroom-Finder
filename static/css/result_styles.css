@@ -2,8 +2,6 @@ body {
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     background-color: #1c1d21;
     margin: 0;
-
-
     padding: 0;
     display: flex;
     flex-direction: column;
@@ -12,30 +10,9 @@ body {
 
 .container {
     flex: 1;
-
     padding: 20px;
-}
-
-h1 {
-    color: #ffffff;
-}
-
-.button {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    display: inline-block;
-    background-color: rgb(18, 136, 3);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    cursor: pointer;
-    border-radius: 5px;
-    margin-top: 20px;
-}
-
-.button:hover {
-    background-color: #0056b3;
+    display: flex;
+    flex-direction: column;
 }
 
 .card-container {
@@ -49,7 +26,6 @@ h1 {
 
 .card {
     background-color: #a4bfc3;
-    border: None;
     border: none;
     border-radius: 8px;
     padding: 15px;
@@ -73,112 +49,68 @@ h1 {
     margin: 0 0 10px 0;
     font-size: 1.5em;
     font-weight: 600;
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
 .card p, .current-info-card p {
     margin: 5px 0;
     font-size: 1.1em;
     font-weight: 600;
-    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     color: #1b1c20;
 }
-
-.card h3 {
-    font-size: 2em; /* Increase the font size of the room numbers */
-}
-
-.feedback-buttons {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-top: 10px;
-}
-
-.feedback-buttons button {
-    background: none;
-    border: 2px solid white;
-    color: white;
-    padding: 5px 15px;
-    font-size: 1em; /* Adjust font size */
-    border-radius: 5px;
-    cursor: pointer;
-    position: relative;
-    width: 100px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.feedback-buttons button:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
-.feedback-buttons button .count {
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-    font-size: 0.8em;
-    color: rgb(39, 37, 37);
-}
-
-.feedback-buttons button .icon {
-    position: relative;
-    margin-right: 10px;
-    font-size: 1.2em; /* Adjust icon size */
-    color: #333; /* Darker color for icons */
-}
-
-.feedback-info {
-    margin-top: 10px;
-    font-size: 0.9em;
-}
-
-@media (max-width: 768px) {
-    .card {
-        width: 100%;
-        max-width: none;
-    }
-}
-
-p {
-    font-size: 16px;
-    color: #ffffff;
-}
-
-h2 {
-    color: #ffffff;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    margin: 5px 0;
-    color: #ffffff;
-}
-
 
 .button-container {
     display: flex;
     gap: 10px; /* Space between the buttons */
     margin-top: 20px; /* Space above the buttons */
+    justify-content: flex-start; /* Align buttons to the start */
+    align-self: center;
+    width: calc(100% - 20px);
+    max-width: 600px;
 }
 
-/* Footer Styling */
+.button {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    display: inline-block;
+    background-color: rgb(18, 136, 3);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
 footer {
-    background-color: #000000; /* Grey background */
+    background-color: #000000; /* Black background */
     color: #ffffff;
     text-align: center;
-    padding: 10px 0;
+    padding: 10px 0; /* Increased padding for a taller footer */
     width: 100%;
-    position: relative;
-    bottom: 0;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+    position: relative; /* Changed to relative */
+    margin-top: auto; /* Push the footer to the bottom */
 }
 
+h1 {
+    color: #ffffff;
+    text-align: center;
+}
+
+/* Media query for larger screens (desktops, tablets) */
+@media (min-width: 768px) {
+    .button-container {
+        margin-left: -25px; /* Apply margin-left for larger screens */
+    }
+}
+
+/* Media query for smaller screens (phones) */
+@media (max-width: 767px) {
+    .button-container {
+        margin-left: -20px; /* Ensure no margin-left for smaller screens */
+    }
+}

@@ -158,7 +158,7 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
     }
 
 # Example of using the process_data function in the main application
-def process_data(day_order, time_table):
+def process_data(day_order, time_table, building_name=None):
     details = find_free_rooms()
     return details
 

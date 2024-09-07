@@ -1,53 +1,4 @@
 body {
-<<<<<<< HEAD
-    font-family: Arial, sans-serif;
-    background-color: #1c1d21;
-    margin: 0;
-    padding: 20px;
-}
-
-.logoimg{
-    height: 100%;
-    width: 40%;
-    align-content: center;
-}
-.heading {
-    color: #ffffff;
-}
-
-form {
-    margin-bottom: 20px;
-}
-
-button {
-    background-color: #050cb7;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-
-
-a {
-    text-decoration: none;
-    color: #007bff;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    margin: 5px 0;
-}
-=======
     background-color: #1c1d21;
     color: #ffffff;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
@@ -124,4 +75,3 @@ footer {
     position: relative;
     bottom: 0;
 }
->>>>>>> 9ecb46e (buildingpage)

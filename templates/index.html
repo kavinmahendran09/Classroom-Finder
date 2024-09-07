@@ -26,6 +26,7 @@
             width: 100%;
             padding: 20px;
             box-sizing: border-box;
+            flex: 1;
         }
 
         h1 {
@@ -38,7 +39,15 @@
         p {
             font-size: 1.1em;
             margin: 10px 0;
-            color: #a4bfc3;
+            color: #b1adad;
+            text-align: center;
+        }
+
+        .p2 {
+            font-size: 1em;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            margin: 10px 0;
+            color: #ffffff;
             text-align: center;
         }
 
@@ -76,6 +85,15 @@
                 margin: 0 auto 20px auto;
             }
         }
+
+        footer {
+            background-color: #000000; /* Black background */
+            color: #ffffff;
+            text-align: center;
+            padding: 16px 0; /* Increased padding for a taller footer */
+            width: 100%;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -84,7 +102,7 @@
         <div class="main-card">
             <h2>Find an Empty Room</h2>
             <p>Looking for a quiet place to study or have lunch? Our tool helps you find available classrooms on campus.</p>
-            <form action="{{ url_for('process') }}" method="post">
+            <form action="{{ url_for('building') }}" method="get">
                 <button type="submit" class="button">Find Free Rooms</button>
             </form>
         </div>
@@ -93,5 +111,8 @@
             <p>Our system checks the current schedule and identifies rooms that are not being used.</p>
         </div>
     </div>
+    <footer>
+        <p class="p2">&copy; 2024 Classroom Finder</p>
+    </footer>
 </body>
 </html>
