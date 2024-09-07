@@ -8,7 +8,7 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-<<<<<<< HEAD
+
 @app.route('/process', methods=['POST'])
 def process():
     if request.method == 'POST':
@@ -16,7 +16,7 @@ def process():
         time_table = pd.read_csv('batch 1/UNIFIED_TIME_TABLE.csv')
         result = process_data(day_order, time_table)
         return render_template('result.html', result=result)
-=======
+
 @app.route('/building', methods=['GET', 'POST'])
 def building():
     if request.method == 'POST':
@@ -34,7 +34,7 @@ def process():
     time_table = pd.read_csv('batch 1/UNIFIED_TIME_TABLE.csv')
     result = process_data(day_order, time_table)
     return render_template('result.html', result=result)
->>>>>>> 9ecb46e (buildingpage)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
