@@ -109,11 +109,11 @@ Date,Day,Month,Day_order
 16,Monday,September,NULL
 17,Tuesday,September,2
 18,Wednesday,September,3
-19,Thursday,September,4
-20,Friday,September,5
+19,Thursday,September,3
+20,Friday,September,2
 21,Saturday,September,NULL
 22,Sunday,September,NULL
-23,Monday,September,1
+23,Monday,September,5
 24,Tuesday,September,2
 25,Wednesday,September,3
 26,Thursday,September,4

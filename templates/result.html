@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Classrooms Availabe</h1>
+        <h1>Classrooms Available</h1>
         <div class="card-container">
             <div class="card current-info-card">
                 <h3>Current Information</h3>
@@ -23,17 +23,6 @@
                         <div class="card" id="room-{{ loop.index }}">
                             <h3>Room {{ loop.index }}</h3>
                             <p>{{ room }}</p>
-                            <div class="feedback-buttons">
-                                <button class="like-button" onclick="handleFeedback('{{ loop.index }}', 'like')">
-                                    <span class="icon"><i class="fa-solid fa-thumbs-up"></i></span>
-                                    <span class="count" id="like-count-{{ loop.index }}">0</span>
-                                </button>
-                                <button class="dislike-button" onclick="handleFeedback('{{ loop.index }}', 'dislike')">
-                                    <span class="icon"><i class="fa-solid fa-thumbs-down"></i></span>
-                                    <span class="count" id="dislike-count-{{ loop.index }}">0</span>
-                                </button>
-                            </div>
-                            <p class="feedback-info">Was this information correct? Let us know to improve.</p>
                         </div>
                     {% endfor %}
                 </div>
@@ -55,37 +44,5 @@
     <footer>
         <p>&copy; 2024 Classroom Finder</p>
     </footer>
-    <script>
-        const feedbackState = {};
-
-        function handleFeedback(roomId, feedbackType) {
-            const likeButton = document.querySelector(`#like-count-${roomId}`);
-            const dislikeButton = document.querySelector(`#dislike-count-${roomId}`);
-
-            if (!feedbackState[roomId]) {
-                feedbackState[roomId] = { liked: false, disliked: false };
-            }
-
-            if (feedbackType === 'like') {
-                if (!feedbackState[roomId].liked) {
-                    feedbackState[roomId].liked = true;
-                    likeButton.textContent = parseInt(likeButton.textContent) + 1;
-                    if (feedbackState[roomId].disliked) {
-                        feedbackState[roomId].disliked = false;
-                        dislikeButton.textContent = parseInt(dislikeButton.textContent) - 1;
-                    }
-                }
-            } else if (feedbackType === 'dislike') {
-                if (!feedbackState[roomId].disliked) {
-                    feedbackState[roomId].disliked = true;
-                    dislikeButton.textContent = parseInt(dislikeButton.textContent) + 1;
-                    if (feedbackState[roomId].liked) {
-                        feedbackState[roomId].liked = false;
-                        likeButton.textContent = parseInt(likeButton.textContent) - 1;
-                    }
-                }
-            }
-        }
-    </script>
 </body>
 </html>

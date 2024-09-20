@@ -1,5 +1,6 @@
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime
+import json
 import pytz
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -7,9 +8,9 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+import os
 
-# Define a global variable for the current day order
-global_current_day_order = None
+CACHE_FILE = 'day_order_cache.json'
 
 # Function to check if today is a weekday
 def is_weekday(custom_day=None):
@@ -20,6 +21,24 @@ def is_weekday(custom_day=None):
 
     # Monday is 0 and Sunday is 6, so check if it's a weekday (Monday to Friday)
     return date_obj.weekday() < 5
+
+# Function to save the day order in the cache
+def save_day_order_to_cache(day_order):
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    cache_data = {
+        "date": current_date,
+        "day_order": day_order
+    }
+    with open(CACHE_FILE, 'w') as f:
+        json.dump(cache_data, f)
+
+# Function to load the day order from the cache
+def load_day_order_from_cache():
+    if os.path.exists(CACHE_FILE):
+        with open(CACHE_FILE, 'r') as f:
+            cache_data = json.load(f)
+            return cache_data
+    return None
 
 # Function to get the day order by scraping the website using Selenium
 def get_day_order_from_web():
@@ -59,10 +78,28 @@ def get_day_order_from_web():
         # Close the browser
         driver.quit()
 
+# Function to get the day order, either from cache or by scraping
+def get_day_order():
+    current_date = datetime.now().strftime("%Y-%m-%d")
+
+    # Try to load from cache
+    cache_data = load_day_order_from_cache()
+    if cache_data:
+        cached_date = cache_data["date"]
+        if cached_date == current_date:
+            # If cache is from today, use it
+            return cache_data["day_order"]
+
+    # If cache is outdated or doesn't exist, scrape it
+    current_day_order = get_day_order_from_web()
+
+    # Save the new day order to cache
+    save_day_order_to_cache(current_day_order)
+
+    return current_day_order
+
 # Function to find free rooms
 def find_free_rooms(custom_time=None, custom_day=None):
-    global global_current_day_order
-
     # Load the CSV file that checks if today is a weekday (if necessary)
     day_order_df = pd.read_csv("batch 1/2024_Day_order.csv")
 
@@ -89,9 +126,9 @@ def find_free_rooms(custom_time=None, custom_day=None):
             "free_rooms": []
         }
 
-    # Get the day order by scraping the website
+    # Get the day order (either from cache or by scraping)
     try:
-        current_day_order = get_day_order_from_web()
+        current_day_order = get_day_order()
     except Exception as e:
         return {
             "status": "error",
@@ -123,4 +160,4 @@ if __name__ == '__main__':
 
 
 
-# Code works Perfectly
+# Code works perfectly need to check after 12:00 am

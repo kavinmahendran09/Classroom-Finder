@@ -1,16 +1,9 @@
 import pandas as pd
 from datetime import datetime, timedelta
 import pytz
-import os
-import json
-import time
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
-CACHE_FILE = 'day_order_cache.json'
+# Define a global variable for the current day order
+global_current_day_order = None
 
 # Function to round time to the next nearest 5 minutes
 def round_time_to_nearest_five(current_time):
@@ -28,92 +21,6 @@ def round_time_to_nearest_five(current_time):
     rounded_time = time_obj.replace(minute=new_minute, second=0).strftime("%H:%M")
     return rounded_time
 
-# Function to check if today is a weekday
-def is_weekday(custom_day=None):
-    if custom_day:
-        date_obj = datetime.strptime(custom_day, "%d %B %Y")
-    else:
-        date_obj = datetime.now()
-
-    # Monday is 0 and Sunday is 6, so check if it's a weekday (Monday to Friday)
-    return date_obj.weekday() < 5
-
-# Function to save the day order in the cache
-def save_day_order_to_cache(day_order):
-    current_date = datetime.now().strftime("%Y-%m-%d")
-    cache_data = {
-        "date": current_date,
-        "day_order": day_order
-    }
-    with open(CACHE_FILE, 'w') as f:
-        json.dump(cache_data, f)
-
-# Function to load the day order from the cache
-def load_day_order_from_cache():
-    if os.path.exists(CACHE_FILE):
-        with open(CACHE_FILE, 'r') as f:
-            cache_data = json.load(f)
-            return cache_data
-    return None
-
-# Function to get the day order by scraping the website using Selenium
-def get_day_order_from_web():
-    driver = webdriver.Safari()
-
-    try:
-        # Define the login URL
-        login_url = 'https://academia-pro.vercel.app/auth/login'
-        driver.get(login_url)
-
-        # Enter login credentials
-        username = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="User ID"]')
-        password = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="Passw*rd"]')  # Replace with actual placeholder
-
-        username.send_keys('kb7634')  # Replace with your actual username
-        password.send_keys('srm@2004KB')  # Replace with your actual password
-        password.send_keys(Keys.RETURN)  # Press Enter to submit the form
-
-        # Wait for login to complete and redirect
-        WebDriverWait(driver, 10).until(
-            EC.url_to_be('https://academia-pro.vercel.app/academia')  # Adjust the URL if needed
-        )
-
-        # Additional wait to ensure the page fully loads
-        time.sleep(10)  # Wait for 10 seconds for the page to load completely
-
-        # Wait for the day order element to be present
-        day_element = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, 'span.text-sm.text-light-accent'))
-        )
-
-        # Extract the day order from the text
-        day_order_text = day_element.text
-        return int(day_order_text.split(" ")[1])  # Assuming it returns "Day X"
-
-    finally:
-        # Close the browser
-        driver.quit()
-
-# Function to get the day order, either from cache or by scraping
-def get_day_order():
-    current_date = datetime.now().strftime("%Y-%m-%d")
-
-    # Try to load from cache
-    cache_data = load_day_order_from_cache()
-    if cache_data:
-        cached_date = cache_data["date"]
-        if cached_date == current_date:
-            # If cache is from today, use it
-            return cache_data["day_order"]
-
-    # If cache is outdated or doesn't exist, scrape it
-    current_day_order = get_day_order_from_web()
-
-    # Save the new day order to cache
-    save_day_order_to_cache(current_day_order)
-
-    return current_day_order
-
 # Function to find free rooms
 def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
     global global_current_day_order  # Declare the global variable inside the function
@@ -123,6 +30,7 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
     detailed_timetable_batch1 = pd.read_csv("batch 1/detailed_timetable.csv")
     unified_timetable_batch2 = pd.read_csv("batch 2/NEW_UNIFIED_TIME_TABLE_24HR.csv")
     detailed_timetable_batch2 = pd.read_csv("batch 2/detailed_timetable_2.csv")
+    day_order_df = pd.read_csv("batch 1/2024_Day_order.csv")
 
     # Combine the timetables and detailed timetables from both batches
     unified_timetable = pd.concat([unified_timetable_batch1, unified_timetable_batch2], ignore_index=True)
@@ -148,11 +56,26 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
     else:
         current_date = datetime.now()
 
-    # Get the current day order
-    if custom_day_order is not None:
+    # Adjust the date format to match the CSV file
+    current_day = current_date.strftime("%d").lstrip("0")  # Remove leading zeros from the day
+    current_month = current_date.strftime("%B")
+    day_order_row = day_order_df[(day_order_df['Date'].astype(str) == current_day) &
+                                 (day_order_df['Month'] == current_month)]
+
+    # Check if the day order is NULL or day_order_row is empty
+    if custom_day_order:
         current_day_order = custom_day_order
     else:
-        current_day_order = get_day_order()
+        if day_order_row.empty or pd.isnull(day_order_row['Day_order'].values[0]):
+            return {
+                "status": "error",
+                "message": "College doesn't run today.",
+                "current_day_order": None,
+                "current_time": current_time,
+                "current_date": current_date.strftime("%d %B %Y"),
+                "free_rooms": []
+            }
+        current_day_order = int(day_order_row['Day_order'].values[0])
 
     # Update the global variable
     global_current_day_order = current_day_order
@@ -204,21 +127,30 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
                               'Room Number'].tolist()
     )
 
-    # Filter out rows from the detailed timetable that match the current day order
-    detailed_filtered_rows = detailed_timetable[detailed_timetable['DayOrder'] == current_day_order]
+    # Map slot to room number from the detailed timetable
+    detailed_slots = detailed_timetable['Slot'].tolist()
+    detailed_rooms = detailed_timetable['RoomNo.'].tolist()
+    detailed_room_map = dict(zip(detailed_slots, detailed_rooms))
 
-    # Append the occupied rooms from the detailed timetable
-    occupied_rooms.update(detailed_filtered_rows['RoomNo.'].tolist())
+    # Identify occupied rooms in the detailed timetable based on the current time slot
+    for course_code in unified_timetable.loc[
+        (unified_timetable['Day'] == f"Day {current_day_order}") & 
+        (unified_timetable['Time Slot'] == current_time_slot),
+        'Course Code'
+    ]:
+        slot = course_code.split('/')[0]
+        room_number = detailed_room_map.get(slot, "Unknown")
+        occupied_rooms.add(room_number)
 
-    # Find all rooms
+    # List all possible rooms
     all_rooms = set(unified_timetable['Room Number'].unique()).union(set(detailed_timetable['RoomNo.'].unique()))
 
-    # Find free rooms by subtracting occupied rooms from all rooms
-    free_rooms = list(all_rooms - occupied_rooms)
+    # Find free rooms and remove 'Unknown'
+    free_rooms = [room for room in list(all_rooms - occupied_rooms) if room != "Unknown"]
 
     return {
         "status": "success",
-        "message": "Free rooms found.",
+        "message": "Data processed successfully",
         "current_day_order": current_day_order,
         "current_time": current_time,
         "current_date": current_date.strftime("%d %B %Y"),
@@ -227,10 +159,21 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
 
 # Example of using the process_data function in the main application
 def process_data(day_order, time_table, building_name=None):
-    details = find_free_rooms(custom_day_order=day_order)
+    details = find_free_rooms()
     return details
 
-# Example of how the final output could be printed
-if __name__ == "__main__":
-    result = find_free_rooms()
+if __name__ == '__main__':
+    # Load the day order and timetable files
+    day_order_df = pd.read_csv('batch 1/2024_Day_order.csv')
+    unified_timetable_batch1 = pd.read_csv("batch 1/UNIFIED_TIME_TABLE.csv")
+    unified_timetable_batch2 = pd.read_csv("batch 2/NEW_UNIFIED_TIME_TABLE_24HR.csv")
+    detailed_timetable_batch1 = pd.read_csv("batch 1/detailed_timetable.csv")
+    detailed_timetable_batch2 = pd.read_csv("batch 2/detailed_timetable_2.csv")
+
+    # Combine the timetables and detailed timetables from both batches
+    unified_timetable = pd.concat([unified_timetable_batch1, unified_timetable_batch2], ignore_index=True)
+    detailed_timetable = pd.concat([detailed_timetable_batch1, detailed_timetable_batch2], ignore_index=True)
+    
+    # Call process_data with the custom time
+    result = process_data(day_order_df, unified_timetable)
     print(result)
