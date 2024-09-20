@@ -86,9 +86,15 @@ def get_day_order_from_web():
             EC.presence_of_element_located((By.CSS_SELECTOR, 'span.text-sm.text-light-accent'))
         )
 
-        # Extract the day order from the text
+        # Extract the day order or holiday status from the text
         day_order_text = day_element.text
-        return int(day_order_text.split(" ")[1])  # Assuming it returns "Day X"
+
+        # Check if the page indicates a "Holiday"
+        if "Holiday" in day_order_text:
+            return "Holiday"
+        
+        # Extract and return the day order (assuming the format is "Day X")
+        return int(day_order_text.split(" ")[1])
 
     finally:
         # Close the browser
@@ -109,7 +115,7 @@ def get_day_order():
     # If cache is outdated or doesn't exist, scrape it
     current_day_order = get_day_order_from_web()
 
-    # Save the new day order to cache
+    # Save the new day order (or "Holiday") to cache
     save_day_order_to_cache(current_day_order)
 
     return current_day_order
@@ -156,6 +162,17 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
 
     # Update the global variable
     global_current_day_order = current_day_order
+
+    # Check if it's a holiday
+    if current_day_order == "Holiday":
+        return {
+            "status": "holiday",
+            "message": "Today is a holiday.",
+            "current_day_order": current_day_order,
+            "current_time": current_time,
+            "current_date": current_date.strftime("%d %B %Y"),
+            "free_rooms": []
+        }
 
     # Check if the current time is before 8:00 AM or after 4:50 PM
     if current_time < "08:00":
@@ -211,26 +228,26 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
     occupied_rooms.update(detailed_filtered_rows['RoomNo.'].tolist())
 
     # Find all rooms
-    all_rooms = set(unified_timetable['Room Number'].unique()).union(set(detailed_timetable['RoomNo.'].unique()))
+    all_rooms = set(unified_timetable['Room Number'].tolist() + detailed_timetable['RoomNo.'].tolist())
 
-    # Find free rooms by subtracting occupied rooms from all rooms
-    free_rooms = list(all_rooms - occupied_rooms)
+    # Calculate free rooms
+    free_rooms = all_rooms - occupied_rooms
 
+    # Return free rooms
     return {
         "status": "success",
-        "message": "Free rooms found.",
+        "message": "Free rooms fetched successfully.",
         "current_day_order": current_day_order,
         "current_time": current_time,
+        "current_time_slot": current_time_slot,
         "current_date": current_date.strftime("%d %B %Y"),
-        "free_rooms": free_rooms
+        "free_rooms": list(free_rooms)
     }
 
-# Example of using the process_data function in the main application
 def process_data(day_order, time_table, building_name=None):
-    details = find_free_rooms(custom_day_order=day_order)
+    details = find_free_rooms()
     return details
 
-# Example of how the final output could be printed
-if __name__ == "__main__":
-    result = find_free_rooms()
-    print(result)
+# Example usage
+result = find_free_rooms()
+print(result)
