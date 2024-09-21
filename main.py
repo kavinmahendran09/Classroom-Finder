@@ -7,8 +7,11 @@ import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
 
 CACHE_FILE = 'day_order_cache.json'
 
@@ -35,7 +38,6 @@ def is_weekday(custom_day=None):
     else:
         date_obj = datetime.now()
 
-    # Monday is 0 and Sunday is 6, so check if it's a weekday (Monday to Friday)
     return date_obj.weekday() < 5
 
 # Function to save the day order in the cache
@@ -56,9 +58,15 @@ def load_day_order_from_cache():
             return cache_data
     return None
 
-# Function to get the day order by scraping the website using Selenium
+# Function to get the day order by scraping the website using Selenium with headless Chrome
 def get_day_order_from_web():
-    driver = webdriver.Safari()
+    # Set up Chrome options for headless mode
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
     try:
         # Define the login URL
@@ -67,7 +75,7 @@ def get_day_order_from_web():
 
         # Enter login credentials
         username = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="User ID"]')
-        password = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="Passw*rd"]')  # Replace with actual placeholder
+        password = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="Passw*rd"]')
 
         username.send_keys('kb7634')  # Replace with your actual username
         password.send_keys('srm@2004KB')  # Replace with your actual password
@@ -75,11 +83,11 @@ def get_day_order_from_web():
 
         # Wait for login to complete and redirect
         WebDriverWait(driver, 10).until(
-            EC.url_to_be('https://academia-pro.vercel.app/academia')  # Adjust the URL if needed
+            EC.url_to_be('https://academia-pro.vercel.app/academia')
         )
 
         # Additional wait to ensure the page fully loads
-        time.sleep(10)  # Wait for 10 seconds for the page to load completely
+        time.sleep(10)
 
         # Wait for the day order element to be present
         day_element = WebDriverWait(driver, 10).until(
@@ -122,48 +130,40 @@ def get_day_order():
 
 # Function to find free rooms
 def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
-    global global_current_day_order  # Declare the global variable inside the function
+    global global_current_day_order
 
-    # Load CSV files with updated paths
     unified_timetable_batch1 = pd.read_csv("batch 1/UNIFIED_TIME_TABLE.csv")
     detailed_timetable_batch1 = pd.read_csv("batch 1/detailed_timetable.csv")
     unified_timetable_batch2 = pd.read_csv("batch 2/NEW_UNIFIED_TIME_TABLE_24HR.csv")
     detailed_timetable_batch2 = pd.read_csv("batch 2/detailed_timetable_2.csv")
 
-    # Combine the timetables and detailed timetables from both batches
     unified_timetable = pd.concat([unified_timetable_batch1, unified_timetable_batch2], ignore_index=True)
     detailed_timetable = pd.concat([detailed_timetable_batch1, detailed_timetable_batch2], ignore_index=True)
 
-    # Define time slots
     time_slots = [
         ("08:00", "08:50"), ("08:50", "09:40"), ("09:45", "10:35"), ("10:40", "11:30"),
         ("11:35", "12:25"), ("12:30", "13:20"), ("13:25", "14:15"), ("14:20", "15:10"),
         ("15:10", "16:00"), ("16:00", "16:50"), ("16:50", "17:30"), ("17:30", "18:10")
     ]
 
-    # Get current time in IST
     if custom_time:
         current_time = custom_time
     else:
         ist = pytz.timezone('Asia/Kolkata')
         current_time = datetime.now(ist).strftime("%H:%M")
 
-    # Get current date
     if custom_day:
         current_date = datetime.strptime(custom_day, "%d %B %Y")
     else:
         current_date = datetime.now()
 
-    # Get the current day order
     if custom_day_order is not None:
         current_day_order = custom_day_order
     else:
         current_day_order = get_day_order()
 
-    # Update the global variable
     global_current_day_order = current_day_order
 
-    # Check if it's a holiday
     if current_day_order == "Holiday":
         return {
             "status": "holiday",
@@ -174,7 +174,6 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
             "free_rooms": []
         }
 
-    # Check if the current time is before 8:00 AM or after 4:50 PM
     if current_time < "08:00":
         return {
             "status": "error",
@@ -194,7 +193,6 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
             "free_rooms": []
         }
 
-    # Find the current time slot
     current_time_slot = None
     for start, end in time_slots:
         if start <= current_time <= end:
@@ -212,7 +210,6 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
             "free_rooms": []
         }
     
-    # Find occupied rooms from the unified timetable
     occupied_rooms = set()
 
     occupied_rooms.update(
@@ -221,19 +218,14 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
                               'Room Number'].tolist()
     )
 
-    # Filter out rows from the detailed timetable that match the current day order
     detailed_filtered_rows = detailed_timetable[detailed_timetable['DayOrder'] == current_day_order]
 
-    # Append the occupied rooms from the detailed timetable
     occupied_rooms.update(detailed_filtered_rows['RoomNo.'].tolist())
 
-    # Find all rooms
     all_rooms = set(unified_timetable['Room Number'].tolist() + detailed_timetable['RoomNo.'].tolist())
 
-    # Calculate free rooms
     free_rooms = all_rooms - occupied_rooms
 
-    # Return free rooms
     return {
         "status": "success",
         "message": "Free rooms fetched successfully.",
@@ -248,6 +240,6 @@ def process_data(day_order, time_table, building_name=None):
     details = find_free_rooms()
     return details
 
-# Example usage
-result = find_free_rooms()
-print(result)
+if __name__ == '__main__':
+    result = find_free_rooms()
+    print(result)
