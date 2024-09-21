@@ -4,3 +4,4 @@ pandas==1.4.1
 gunicorn==22.0.0
 pytz==2021.3
 selenium==4.24.0
+webdriver-manager==4.0.2
