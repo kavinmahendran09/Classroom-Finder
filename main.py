@@ -76,8 +76,6 @@ def get_day_order_from_web():
         login_url = 'https://academia-pro.vercel.app/auth/login'
         driver.get(login_url)
         
-        print("Navigated to login page.")
-
         # Enter login credentials
         username = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="User ID"]')
         password = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="Passw*rd"]')
@@ -92,9 +90,7 @@ def get_day_order_from_web():
         WebDriverWait(driver, 15).until(
             EC.url_to_be('https://academia-pro.vercel.app/academia')
         )
-        
-        print("Login successful, waiting for the page to load.")
-        
+            
         # Wait for the day order element to be present
         day_element = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, 'span.text-sm.text-light-accent'))
@@ -102,7 +98,6 @@ def get_day_order_from_web():
 
         # Extract the day order or holiday status from the text
         day_order_text = day_element.text
-        print(f"Extracted day order text: {day_order_text}")
 
         # Check if the page indicates a "Holiday"
         if "Holiday" in day_order_text:
