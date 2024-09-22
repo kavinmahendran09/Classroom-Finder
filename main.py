@@ -65,6 +65,9 @@ def get_day_order_from_web():
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920x1080")
+    chrome_options.add_argument("--start-maximized")
     
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
@@ -72,6 +75,8 @@ def get_day_order_from_web():
         # Define the login URL
         login_url = 'https://academia-pro.vercel.app/auth/login'
         driver.get(login_url)
+        
+        print("Navigated to login page.")
 
         # Enter login credentials
         username = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="User ID"]')
@@ -81,14 +86,15 @@ def get_day_order_from_web():
         password.send_keys('srm@2004KB')  # Replace with your actual password
         password.send_keys(Keys.RETURN)  # Press Enter to submit the form
 
+        print("Submitted login credentials.")
+        
         # Wait for login to complete and redirect
-        WebDriverWait(driver, 10).until(
+        WebDriverWait(driver, 15).until(
             EC.url_to_be('https://academia-pro.vercel.app/academia')
         )
-
-        # Additional wait to ensure the page fully loads
-        time.sleep(10)
-
+        
+        print("Login successful, waiting for the page to load.")
+        
         # Wait for the day order element to be present
         day_element = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, 'span.text-sm.text-light-accent'))
@@ -96,6 +102,7 @@ def get_day_order_from_web():
 
         # Extract the day order or holiday status from the text
         day_order_text = day_element.text
+        print(f"Extracted day order text: {day_order_text}")
 
         # Check if the page indicates a "Holiday"
         if "Holiday" in day_order_text:
@@ -104,6 +111,9 @@ def get_day_order_from_web():
         # Extract and return the day order (assuming the format is "Day X")
         return int(day_order_text.split(" ")[1])
 
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
     finally:
         # Close the browser
         driver.quit()
@@ -233,13 +243,14 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
         "current_time": current_time,
         "current_time_slot": current_time_slot,
         "current_date": current_date.strftime("%d %B %Y"),
-        "free_rooms": list(free_rooms)
+        "free_rooms": sorted(list(free_rooms))
     }
 
 def process_data(day_order, time_table, building_name=None):
     details = find_free_rooms()
     return details
 
-if __name__ == '__main__':
-    result = find_free_rooms()
-    print(result)
+# Test calling the function to check for free rooms
+if __name__ == "__main__":
+    free_rooms_data = find_free_rooms()
+    print(free_rooms_data)
