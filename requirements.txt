@@ -5,4 +5,4 @@ gunicorn==22.0.0
 pytz==2021.3
 selenium==4.24.0
 webdriver-manager==4.0.2
-chromedriver-autoinstaller==0.5.1
+chromedriver-autoinstaller==0.6.4
