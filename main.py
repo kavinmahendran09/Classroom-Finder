@@ -68,7 +68,7 @@ def get_day_order_from_web():
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920x1080")
     chrome_options.add_argument("--start-maximized")
-    chrome_options.binary_location = "/usr/local/chromium/chrome"
+    chrome_options.binary_location = "/usr/bin/google-chrome"
     
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
