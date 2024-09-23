@@ -11,9 +11,10 @@ wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get install -f
 
 # Check where Chrome is installed and print it
-echo "Checking Google Chrome installation path..."
-which google-chrome
-google-chrome --version
+LOGFILE="/path/to/your/logfile.log"
+echo "Checking Google Chrome installation path..." >> $LOGFILE
+which google-chrome >> $LOGFILE 2>&1
+google-chrome --version >> $LOGFILE 2>&1
 
 # Install Python dependencies
 pip install -r requirements.txt
