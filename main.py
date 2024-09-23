@@ -68,6 +68,7 @@ def get_day_order_from_web():
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920x1080")
     chrome_options.add_argument("--start-maximized")
+    chrome_options.binary_location = "/usr/bin/chromium-browser"
     
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
@@ -133,6 +134,11 @@ def get_day_order():
 
     return current_day_order
 
+# Helper function to convert time to 12-hour format with AM/PM
+def convert_to_12_hour_format(time_24):
+    time_obj = datetime.strptime(time_24, "%H:%M")
+    return time_obj.strftime("%I:%M %p").lstrip("0")  # Remove leading zero
+
 # Function to find free rooms
 def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
     global global_current_day_order
@@ -174,7 +180,7 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
             "status": "holiday",
             "message": "Today is a holiday.",
             "current_day_order": current_day_order,
-            "current_time": current_time,
+            "current_time": convert_to_12_hour_format(current_time),
             "current_date": current_date.strftime("%d %B %Y"),
             "free_rooms": []
         }
@@ -184,7 +190,7 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
             "status": "error",
             "message": "College not yet started.",
             "current_day_order": current_day_order,
-            "current_time": current_time,
+            "current_time": convert_to_12_hour_format(current_time),
             "current_date": current_date.strftime("%d %B %Y"),
             "free_rooms": []
         }
@@ -193,7 +199,7 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
             "status": "error",
             "message": "College over.",
             "current_day_order": current_day_order,
-            "current_time": current_time,
+            "current_time": convert_to_12_hour_format(current_time),
             "current_date": current_date.strftime("%d %B %Y"),
             "free_rooms": []
         }
@@ -208,13 +214,13 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
         next_update_time = round_time_to_nearest_five(current_time)
         return {
             "status": "error",
-            "message": f"Free rooms get updated at: {next_update_time}",
+            "message": f"Free rooms get updated at: {convert_to_12_hour_format(next_update_time)}",
             "current_day_order": current_day_order,
-            "current_time": current_time,
+            "current_time": convert_to_12_hour_format(current_time),
             "current_date": current_date.strftime("%d %B %Y"),
             "free_rooms": []
         }
-    
+
     occupied_rooms = set()
 
     occupied_rooms.update(
@@ -235,12 +241,13 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
         "status": "success",
         "message": "Free rooms fetched successfully.",
         "current_day_order": current_day_order,
-        "current_time": current_time,
-        "current_time_slot": current_time_slot,
+        "current_time": convert_to_12_hour_format(current_time),
+        "current_time_slot": convert_to_12_hour_format(current_time_slot.split(" - ")[0]) + " - " + convert_to_12_hour_format(current_time_slot.split(" - ")[1]),
         "current_date": current_date.strftime("%d %B %Y"),
         "free_rooms": sorted(list(free_rooms))
     }
 
+# Final function that calls find_free_rooms and returns the details
 def process_data(day_order, time_table, building_name=None):
     details = find_free_rooms()
     return details

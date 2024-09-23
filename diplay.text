@@ -1,0 +1,3 @@
+def process_data(day_order, time_table, building_name=None):
+    details = find_free_rooms()
+    return details
