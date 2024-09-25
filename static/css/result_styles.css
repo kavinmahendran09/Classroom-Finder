@@ -109,6 +109,15 @@ h1 {
 
 /* Media query for smaller screens (phones) */
 @media (max-width: 767px) {
+    .card-container {
+        margin-left: 5px;  /* Add some margin to the left */
+        margin-right: 5px; /* Add some margin to the right */
+    }
+    
+    .card {
+        width: calc(100% - 20px); /* Reduce the width to leave space on both sides */
+    }
+
     .button-container {
         margin-left: -20px; /* Ensure no margin-left for smaller screens */
     }
