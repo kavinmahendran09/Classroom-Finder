@@ -87,14 +87,16 @@
         }
 
         footer {
-            background-color: #000000; /* Black background */
-            color: #ffffff;
-            text-align: center;
-            padding: 16px 0; /* Increased padding for a taller footer */
-            width: 100%;
-            bottom : 0;
-            position: fixed; /* Make the footer fixed */
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+        background-color: #000000; /* Black background */
+        color: #ffffff;
+        text-align: center;
+        padding: 16px 0; /* Increased padding for a taller footer */
+        width: 100%;
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+        position: fixed; /* Make the footer fixed */
+        bottom: 0; /* Align it to the bottom of the viewport */
+        left: 0; /* Ensure it stretches across the screen */
+        z-index: 10; /* Place it above other elements */
         }
     </style>
 </head>
