@@ -17,8 +17,8 @@ try:
     username = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="User ID"]')
     password = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="Passw*rd"]')  # Assuming there's a similar placeholder for password
 
-    username.send_keys('kb7634')  # Replace with your actual username
-    password.send_keys('srm@2004KB')  # Replace with your actual password
+    username.send_keys('sm6086')  # Replace with your actual username
+    password.send_keys('Sri$hti89039')  # Replace with your actual password
     password.send_keys(Keys.RETURN)  # Press Enter to submit the form
 
     # Wait for login to complete and redirect

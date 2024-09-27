@@ -177,3 +177,4 @@ if __name__ == '__main__':
     # Call process_data with the custom time
     result = process_data(day_order_df, unified_timetable)
     print(result)
+    print(detailed_timetable.columns)  # This will show the actual column names
