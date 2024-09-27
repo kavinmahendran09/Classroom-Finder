@@ -79,6 +79,7 @@
         padding: 10px 20px;
         text-align: center;
         text-decoration: none;
+        margin-left: -2.5px;
         cursor: pointer;
         border-radius: 5px;
         }
@@ -109,6 +110,12 @@
             position: absolute;
             bottom: 0;
             box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 767px) {
+            .button-container {
+                margin-left: -5.3px; /* Ensure no margin-left for smaller screens */
+            }
         }
     </style>
 </head>

@@ -76,6 +76,7 @@ body {
     padding: 10px 20px;
     text-align: center;
     text-decoration: none;
+    margin-left: -2.5px;
     cursor: pointer;
     border-radius: 5px;
 }
@@ -119,6 +120,6 @@ h1 {
     }
 
     .button-container {
-        margin-left: -20px; /* Ensure no margin-left for smaller screens */
+        margin-left: -15.5px; /* Ensure no margin-left for smaller screens */
     }
 }
