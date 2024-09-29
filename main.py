@@ -1,19 +1,17 @@
 import pandas as pd
 from datetime import datetime, timedelta
 import pytz
-import os
-import json
-import time
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
 
-CACHE_FILE = 'day_order_cache.json'
+# Define a global variable for the current day order
+global_current_day_order = None
 
 # Function to round time to the next nearest 5 minutes
 def round_time_to_nearest_five(current_time):
@@ -31,34 +29,7 @@ def round_time_to_nearest_five(current_time):
     rounded_time = time_obj.replace(minute=new_minute, second=0).strftime("%H:%M")
     return rounded_time
 
-# Function to check if today is a weekday
-def is_weekday(custom_day=None):
-    if custom_day:
-        date_obj = datetime.strptime(custom_day, "%d %B %Y")
-    else:
-        date_obj = datetime.now()
-
-    return date_obj.weekday() < 5
-
-# Function to save the day order in the cache
-def save_day_order_to_cache(day_order):
-    current_date = datetime.now().strftime("%Y-%m-%d")
-    cache_data = {
-        "date": current_date,
-        "day_order": day_order
-    }
-    with open(CACHE_FILE, 'w') as f:
-        json.dump(cache_data, f)
-
-# Function to load the day order from the cache
-def load_day_order_from_cache():
-    if os.path.exists(CACHE_FILE):
-        with open(CACHE_FILE, 'r') as f:
-            cache_data = json.load(f)
-            return cache_data
-    return None
-
-# Function to get the day order by scraping the website using Selenium with headless Chrome
+# Function to scrape the day order from the web
 def get_day_order_from_web():
     # Set up Chrome options for headless mode
     chrome_options = Options()
@@ -67,9 +38,6 @@ def get_day_order_from_web():
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920x1080")
-    chrome_options.add_argument("--start-maximized")
-    #chrome_options.binary_location = "/opt/render/project/.render/chrome/opt/google/chrome/google-chrome"  # Chrome binary path
-
     
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
@@ -103,7 +71,7 @@ def get_day_order_from_web():
 
         # Check if the page indicates a "Holiday"
         if "Holiday" in day_order_text:
-            return "Holiday"
+            return None  # Return None for holiday
         
         # Extract and return the day order (assuming the format is "Day X")
         return int(day_order_text.split(" ")[1])
@@ -115,83 +83,94 @@ def get_day_order_from_web():
         # Close the browser
         driver.quit()
 
-# Function to get the day order, either from cache or by scraping
-def get_day_order():
-    current_date = datetime.now().strftime("%Y-%m-%d")
-
-    # Try to load from cache
-    cache_data = load_day_order_from_cache()
-    if cache_data:
-        cached_date = cache_data["date"]
-        if cached_date == current_date:
-            # If cache is from today, use it
-            return cache_data["day_order"]
-
-    # If cache is outdated or doesn't exist, scrape it
-    current_day_order = get_day_order_from_web()
-
-    # Save the new day order (or "Holiday") to cache
-    save_day_order_to_cache(current_day_order)
-
-    return current_day_order
-
-# Helper function to convert time to 12-hour format with AM/PM
-def convert_to_12_hour_format(time_24):
-    time_obj = datetime.strptime(time_24, "%H:%M")
-    return time_obj.strftime("%I:%M %p").lstrip("0")  # Remove leading zero
-
 # Function to find free rooms
 def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
-    global global_current_day_order
+    global global_current_day_order  # Declare the global variable inside the function
 
+    # Load CSV files with updated paths
     unified_timetable_batch1 = pd.read_csv("batch 1/UNIFIED_TIME_TABLE.csv")
     detailed_timetable_batch1 = pd.read_csv("batch 1/detailed_timetable.csv")
     unified_timetable_batch2 = pd.read_csv("batch 2/NEW_UNIFIED_TIME_TABLE_24HR.csv")
     detailed_timetable_batch2 = pd.read_csv("batch 2/detailed_timetable_2.csv")
+    day_order_df = pd.read_csv("batch 1/2024_Day_order.csv")
 
+    # Combine the timetables and detailed timetables from both batches
     unified_timetable = pd.concat([unified_timetable_batch1, unified_timetable_batch2], ignore_index=True)
     detailed_timetable = pd.concat([detailed_timetable_batch1, detailed_timetable_batch2], ignore_index=True)
 
+    # Define time slots
     time_slots = [
         ("08:00", "08:50"), ("08:50", "09:40"), ("09:45", "10:35"), ("10:40", "11:30"),
         ("11:35", "12:25"), ("12:30", "13:20"), ("13:25", "14:15"), ("14:20", "15:10"),
         ("15:10", "16:00"), ("16:00", "16:50"), ("16:50", "17:30"), ("17:30", "18:10")
     ]
 
+    # Get current time in IST
     if custom_time:
         current_time = custom_time
     else:
         ist = pytz.timezone('Asia/Kolkata')
         current_time = datetime.now(ist).strftime("%H:%M")
 
+    # Get current date
     if custom_day:
         current_date = datetime.strptime(custom_day, "%d %B %Y")
     else:
         current_date = datetime.now()
 
-    if custom_day_order is not None:
-        current_day_order = custom_day_order
+    # Adjust the date format to match the CSV file
+    current_day = current_date.strftime("%d").lstrip("0")  # Remove leading zeros from the day
+    current_month = current_date.strftime("%B")
+    
+    # Check for today's information in the CSV file
+    day_order_row = day_order_df[(day_order_df['Date'].astype(str) == current_day) &
+                                 (day_order_df['Month'].str.lower() == current_month.lower())]
+
+    # If today's information is not in the CSV, scrape it from the web
+    if day_order_row.empty:
+        day_order = get_day_order_from_web()
+        if day_order is None:
+            day_order = "NULL"  # Use 'NULL' for holidays
+        else:
+            day_order = int(day_order)
+        
+        # Update the CSV file with new data only
+        new_entry = pd.DataFrame({
+            'Date': [current_day],
+            'Day': [datetime.now().strftime("%A")],
+            'Month': [current_month],
+            'Day_order': [day_order]
+        }, columns=day_order_df.columns)  # Keep the same columns to avoid mismatch
+
+        # Append the new entry to the CSV file without altering existing data
+        day_order_df = pd.concat([day_order_df, new_entry], ignore_index=True)
+        day_order_df.to_csv("batch 1/2024_Day_order.csv", index=False, float_format='%.0f')  # Ensure no float conversion
     else:
-        current_day_order = get_day_order()
+        day_order = day_order_row['Day_order'].values[0]
+        if pd.isnull(day_order):  # If it is NULL in CSV, set it as None
+            day_order = None
 
-    global_current_day_order = current_day_order
-
-    if current_day_order == "Holiday":
+    # Check if the day order is NULL
+    if day_order == "NULL" or day_order is None:
         return {
-            "status": "holiday",
-            "message": "Today is a holiday.",
-            "current_day_order": current_day_order,
-            "current_time": convert_to_12_hour_format(current_time),
+            "status": "error",
+            "message": "College doesn't run today.",
+            "current_day_order": None,
+            "current_time": current_time,
             "current_date": current_date.strftime("%d %B %Y"),
             "free_rooms": []
         }
+    
+    # Update the global variable
+    global_current_day_order = int(day_order)
 
+    # Check if the current time is before 8:00 AM or after 4:50 PM
     if current_time < "08:00":
         return {
             "status": "error",
             "message": "College not yet started.",
-            "current_day_order": current_day_order,
-            "current_time": convert_to_12_hour_format(current_time),
+            "current_day_order": global_current_day_order,
+            "current_time": current_time,
             "current_date": current_date.strftime("%d %B %Y"),
             "free_rooms": []
         }
@@ -199,12 +178,13 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
         return {
             "status": "error",
             "message": "College over.",
-            "current_day_order": current_day_order,
-            "current_time": convert_to_12_hour_format(current_time),
+            "current_day_order": global_current_day_order,
+            "current_time": current_time,
             "current_date": current_date.strftime("%d %B %Y"),
             "free_rooms": []
         }
 
+    # Find the current time slot
     current_time_slot = None
     for start, end in time_slots:
         if start <= current_time <= end:
@@ -215,45 +195,63 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
         next_update_time = round_time_to_nearest_five(current_time)
         return {
             "status": "error",
-            "message": f"Free rooms get updated at: {convert_to_12_hour_format(next_update_time)}",
-            "current_day_order": current_day_order,
-            "current_time": convert_to_12_hour_format(current_time),
+            "message": f"Free rooms get updated at: {next_update_time}",
+            "current_day_order": global_current_day_order,
+            "current_time": current_time,
             "current_date": current_date.strftime("%d %B %Y"),
             "free_rooms": []
         }
-
+    
+    # Find occupied rooms from the unified timetable
     occupied_rooms = set()
 
     occupied_rooms.update(
-        unified_timetable.loc[(unified_timetable['Day'] == f"Day {current_day_order}") &
-                              (unified_timetable['Time Slot'] == current_time_slot),
-                              'Room Number'].tolist()
+        unified_timetable.loc[
+            (unified_timetable['Day'] == f"Day {global_current_day_order}") & 
+            (unified_timetable['Time Slot'] == current_time_slot),
+            'Room Number'
+        ]
     )
+    
+    # Identify occupied rooms in the detailed timetable
+    for course_code in unified_timetable.loc[
+        (unified_timetable['Day'] == f"Day {global_current_day_order}") & 
+        (unified_timetable['Time Slot'] == current_time_slot),
+        'Course Code'
+    ]:
+        slot = course_code.split('/')[0]
+        room_number_series = detailed_timetable.loc[detailed_timetable['Slot'] == slot, 'RoomNo.']
+        
+        # Check if room_number_series is not empty before accessing
+        if not room_number_series.empty:
+            room_number = room_number_series.values[0]
+            occupied_rooms.add(room_number)
 
-    detailed_filtered_rows = detailed_timetable[detailed_timetable['DayOrder'] == current_day_order]
+    # List all possible rooms
+    all_rooms = set(unified_timetable['Room Number'].unique()).union(set(detailed_timetable['RoomNo.'].unique()))
 
-    occupied_rooms.update(detailed_filtered_rows['RoomNo.'].tolist())
-
-    all_rooms = set(unified_timetable['Room Number'].tolist() + detailed_timetable['RoomNo.'].tolist())
-
-    free_rooms = all_rooms - occupied_rooms
+    # Find free rooms and remove 'Unknown'
+    free_rooms = [room for room in list(all_rooms - occupied_rooms) if room != "Unknown"]
 
     return {
         "status": "success",
-        "message": "Free rooms fetched successfully.",
-        "current_day_order": current_day_order,
-        "current_time": convert_to_12_hour_format(current_time),
-        "current_time_slot": convert_to_12_hour_format(current_time_slot.split(" - ")[0]) + " - " + convert_to_12_hour_format(current_time_slot.split(" - ")[1]),
+        "message": "Data processed successfully",
+        "current_day_order": global_current_day_order,
+        "current_time": current_time,
         "current_date": current_date.strftime("%d %B %Y"),
-        "free_rooms": sorted(list(free_rooms))
+        "free_rooms": free_rooms
     }
 
-# Final function that calls find_free_rooms and returns the details
-def process_data(day_order, time_table, building_name=None):
+
+# Example of using the process_data function in the main application
+def process_data(day_order_df, time_table):
     details = find_free_rooms()
     return details
 
-# Test calling the function to check for free rooms
-if __name__ == "__main__":
-    free_rooms_data = find_free_rooms()
-    print(free_rooms_data)
+if __name__ == '__main__':
+    # Load the day order and timetable files
+    day_order_df = pd.read_csv('batch 1/2024_Day_order.csv')
+
+    # Call process_data with the current date and time
+    result = process_data(day_order_df, None)
+    print(result)
