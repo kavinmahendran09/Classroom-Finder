@@ -41,7 +41,7 @@ def get_day_order_from_web():
     chrome_options.binary_location = "/opt/render/project/src/chrome/opt/google/chrome/google-chrome"
 
     driver = webdriver.Chrome(
-        service=Service(ChromeDriverManager(driver_version="129.0.6668.70").install()), 
+        service=Service(ChromeDriverManager(driver_version="114.0.5735.90").install()), 
         options=chrome_options
     )
     
