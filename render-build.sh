@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
-# Install Chrome
-apt-get update && apt-get install -y wget gnupg2
-wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
-sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-apt-get update && apt-get install -y google-chrome-stable
+
+# Download Chromium binary
+CHROME_BIN_DIR="chrome"
+mkdir -p $CHROME_BIN_DIR
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O $CHROME_BIN_DIR/google-chrome.deb
+dpkg -x $CHROME_BIN_DIR/google-chrome.deb $CHROME_BIN_DIR
+export PATH="$CHROME_BIN_DIR/opt/google/chrome:$PATH"
+
+# Install Python dependencies
+pip install -r requirements.txt
