@@ -11,27 +11,30 @@
     <div class="container">
         <h1>Classrooms Available</h1>
         <div class="card-container">
+            <!-- Current Information Card -->
             <div class="card current-info-card">
                 <h3>Current Information</h3>
                 <p><strong>Current Date:</strong> {{ result.current_date }}</p>
                 <p><strong>Current Time:</strong> {{ result.current_time }}</p>
                 <p><strong>Current Day Order:</strong> {{ result.current_day_order }}</p>
             </div>
+
+            <!-- Free Classrooms Cards -->
             {% if result.status == 'success' %}
-                <div class="card-container">
-                    {% for room in result.free_rooms %}
-                        <div class="card" id="room-{{ loop.index }}">
-                            <h3>Room {{ loop.index }}</h3>
-                            <p>{{ room }}</p>
-                        </div>
-                    {% endfor %}
-                </div>
+                {% for room in result.free_rooms %}
+                    <div class="card" id="room-{{ loop.index }}">
+                        <h3>Room {{ loop.index }}</h3>
+                        <p>{{ room }}</p>
+                    </div>
+                {% endfor %}
             {% else %}
                 <div class="card">
                     <p>{{ result.message }}</p>
                 </div>
             {% endif %}
         </div>
+
+        <!-- Button Container -->
         <div class="button-container">
             <form action="{{ url_for('building') }}" method="get">
                 <button type="submit" class="button">Go Back</button>
@@ -41,6 +44,7 @@
             </form>
         </div>
     </div>
+
     <footer>
         <p>Created by <a href="https://www.linkedin.com/in/kavin-bharathi-081577252" target="_blank" style="color: inherit; text-decoration: underline;">Kavin</a></p>
     </footer>
