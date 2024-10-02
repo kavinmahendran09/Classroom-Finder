@@ -13,6 +13,11 @@ from selenium.webdriver.chrome.options import Options
 # Define a global variable for the current day order
 global_current_day_order = None
 
+# Function to convert 24-hour time to 12-hour format
+def convert_to_12_hour_format(time_str):
+    time_obj = datetime.strptime(time_str, "%H:%M")
+    return time_obj.strftime("%I:%M %p")
+
 # Function to round time to the next nearest 5 minutes
 def round_time_to_nearest_five(current_time):
     time_obj = datetime.strptime(current_time, "%H:%M")
@@ -157,7 +162,7 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
             "status": "error",
             "message": "College doesn't run today.",
             "current_day_order": None,
-            "current_time": current_time,
+            "current_time": convert_to_12_hour_format(current_time),
             "current_date": current_date.strftime("%d %B %Y"),
             "free_rooms": []
         }
@@ -171,7 +176,7 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
             "status": "error",
             "message": "College not yet started.",
             "current_day_order": global_current_day_order,
-            "current_time": current_time,
+            "current_time": convert_to_12_hour_format(current_time),
             "current_date": current_date.strftime("%d %B %Y"),
             "free_rooms": []
         }
@@ -180,7 +185,7 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
             "status": "error",
             "message": "College over.",
             "current_day_order": global_current_day_order,
-            "current_time": current_time,
+            "current_time": convert_to_12_hour_format(current_time),
             "current_date": current_date.strftime("%d %B %Y"),
             "free_rooms": []
         }
@@ -198,7 +203,7 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
             "status": "error",
             "message": f"Free rooms get updated at: {next_update_time}",
             "current_day_order": global_current_day_order,
-            "current_time": current_time,
+            "current_time": convert_to_12_hour_format(current_time),
             "current_date": current_date.strftime("%d %B %Y"),
             "free_rooms": []
         }
@@ -238,7 +243,7 @@ def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
         "status": "success",
         "message": "Data processed successfully",
         "current_day_order": global_current_day_order,
-        "current_time": current_time,
+        "current_time": convert_to_12_hour_format(current_time),
         "current_date": current_date.strftime("%d %B %Y"),
         "free_rooms": free_rooms
     }
