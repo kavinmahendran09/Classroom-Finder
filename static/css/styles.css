@@ -2,7 +2,7 @@ body {
     height: 100%;
     background-color: #1c1d21;
     color: #ffffff;
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-family: 'Trebuchet MS', sans-serif;
     margin: 0;
     padding: 0;
     overflow: hidden;
@@ -13,7 +13,7 @@ body {
 }
 
 .container {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-family: 'Trebuchet MS', sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -32,7 +32,7 @@ h1 {
 }
 
 .button {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-family: 'Trebuchet MS', sans-serif;
     background-color: rgb(18, 136, 3);
     color: white;
     border: none;
@@ -50,7 +50,7 @@ h1 {
 }
 
 .main-card, .sub-card {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-family: 'Trebuchet MS', sans-serif;
     background-color: #2d2e33;
     border-radius: 10px;
     padding: 15px;

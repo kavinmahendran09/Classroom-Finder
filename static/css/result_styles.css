@@ -68,7 +68,7 @@ body {
 }
 
 .button {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-family: 'Trebuchet MS', sans-serif;
     display: inline-block;
     background-color: rgb(18, 136, 3);
     color: white;
@@ -82,7 +82,7 @@ body {
 }
 
 .button:hover {
-    background-color: #0056b3;
+    background-color: rgb(18, 116, 12);
 }
 
 footer {
