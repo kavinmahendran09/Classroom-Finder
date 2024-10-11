@@ -56,18 +56,23 @@ def get_day_order_from_web():
         username = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="User ID"]')
         password = driver.find_element(By.CSS_SELECTOR, 'input[placeholder="Passw*rd"]')
 
-        username.send_keys('sm6086')  # Replace with your actual username
-        password.send_keys('Sri$hti89039')  # Replace with your actual password
+        username.send_keys('kb7634')  # Replace with your actual username
+        password.send_keys('srm@2004KB')  # Replace with your actual password
         password.send_keys(Keys.RETURN)  # Press Enter to submit the form
 
         print("Submitted login credentials.")
         
         # Wait for login to complete and redirect
-        WebDriverWait(driver, 15).until(
+        WebDriverWait(driver, 6).until(
             EC.url_to_be('https://academia-pro.vercel.app/academia')
         )
-            
-        # Wait for the day order element to be present
+        
+        # Wait until the entire page is fully loaded
+        WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, 'div.some-page-loaded-indicator'))  # Replace with an appropriate element
+        )
+
+        # Ensure the day order element is present
         day_element = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, 'span.text-sm.text-light-accent'))
         )
@@ -88,6 +93,7 @@ def get_day_order_from_web():
     finally:
         # Close the browser
         driver.quit()
+
 
 # Function to find free rooms
 def find_free_rooms(custom_time=None, custom_day_order=None, custom_day=None):
